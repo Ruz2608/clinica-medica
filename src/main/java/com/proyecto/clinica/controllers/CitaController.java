@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/citas")
-@CrossOrigin(origins = "*") // Para que tu HTML se conecte sin problemas
+@CrossOrigin(origins = "*") 
 public class CitaController {
 
     @Autowired
@@ -20,9 +20,9 @@ public class CitaController {
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarCita(@RequestBody Cita cita) {
         try {
-            cita.setEstado("PENDIENTE"); // Toda cita nueva empieza como pendiente
+            cita.setEstado("PENDIENTE");
             citaRepository.save(cita);
-            return ResponseEntity.ok().build(); // Respuesta vacía y segura
+            return ResponseEntity.ok().build(); 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error al agendar: " + e.getMessage());
         }
@@ -30,7 +30,6 @@ public class CitaController {
 
     @GetMapping("/listar")
     public List<Map<String, Object>> listarCitas() {
-        // Mapeamos manualmente para enviar un JSON limpio al Front sin relaciones pesadas
         return citaRepository.findAll().stream().map(c -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", c.getId());
@@ -43,7 +42,6 @@ public class CitaController {
             return map;
         }).collect(Collectors.toList());
     }
-    // --- COMPLETAR CITA ---
     @PutMapping("/{id}/completar")
     public ResponseEntity<?> completarCita(@PathVariable Long id) {
         return citaRepository.findById(id).map(cita -> {
@@ -53,7 +51,6 @@ public class CitaController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // --- CANCELAR CITA ---
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> cancelarCita(@PathVariable Long id) {
         return citaRepository.findById(id).map(cita -> {
