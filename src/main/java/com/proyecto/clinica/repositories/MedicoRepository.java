@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MedicoRepository extends JpaRepository<Medico, String> { 
-    // Spring Data JPA lo hace por ti con el nombre del método
+    
 List<Paciente> findByCodigoIdentificativo(String codigoIdentificativo);
 }
