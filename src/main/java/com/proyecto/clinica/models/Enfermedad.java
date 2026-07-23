@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 public class Enfermedad {
     @Id
     @JsonProperty("codigo")
-    private String codigo; // Código asignado de forma arbitraria 
+    private String codigo; 
     
-    private String nombre; // 
-    private String sistemaCorporal; // Aparato o sistema corporal al que afecta 
-    private String descripcion; // 
+    private String nombre; 
+    private String sistemaCorporal; 
+    private String descripcion; 
     
     @JsonIgnore
     @ManyToMany(mappedBy = "enfermedades")
