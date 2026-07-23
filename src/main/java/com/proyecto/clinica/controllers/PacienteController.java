@@ -21,12 +21,10 @@ public class PacienteController {
     @Autowired
     private MedicoRepository medicoRepository;
 
-    // --- MÉTODO CORREGIDO PARA REGISTRO MANUAL ---
-    // Recibe el objeto Paciente completo desde el Frontend
     @PostMapping("/registrar")
     public ResponseEntity<?> registrar(@RequestBody Paciente paciente) {
         pacienteRepository.save(paciente);
-        return ResponseEntity.ok().build(); // Devolver un 200 OK vacío es mucho más seguro
+        return ResponseEntity.ok().build(); 
 
         }
     @GetMapping("/listar")
@@ -39,7 +37,6 @@ public class PacienteController {
     }
 }
 
-    // --- ASIGNAR MÉDICO ---
     @PutMapping("/{numeroHistorial}/asignar-medico/{codigoMedico}")
     public Paciente asignarMedico(
             @PathVariable String numeroHistorial, 
@@ -55,7 +52,6 @@ public class PacienteController {
         return pacienteRepository.save(paciente);
     }
 
-    // --- OBTENER HISTORIAL ---
     @GetMapping("/historial/{numeroHistorial}")
 public ResponseEntity<?> obtenerHistorial(@PathVariable String numeroHistorial) {
     return pacienteRepository.findById(numeroHistorial)
