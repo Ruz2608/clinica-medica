@@ -27,21 +27,17 @@ public ResponseEntity<?> registrarMedico(@RequestBody Medico medico) {
     try {
         String tipo = medico.getTipoContratacion();
         
-        // 1. Validación de lógica de negocio
+        
         if (tipo == null || (!tipo.equals("NOMBRADO") && 
                              !tipo.equals("CONTRATADO") && 
                              !tipo.equals("CONSULTOR"))) {
             return ResponseEntity.badRequest().body("Tipo de contratación inválido: " + tipo);
         }
-
-        // 2. Guardado en la base de datos
         Medico medicoGuardado = medicoRepository.save(medico);
 
-        // 3. Respuesta segura (Evita que el backend colapse al serializar)
         return ResponseEntity.ok(medicoGuardado);
 
     } catch (Exception e) {
-        // Captura cualquier error (como DNI duplicado o código repetido)
         return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
     }
 }
