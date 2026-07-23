@@ -1,0 +1,19 @@
+# 1. Driver oficial
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# 2. URL, usuario y password ahora vienen de variables de entorno.
+#    El valor despues de ":" es el que se usa SOLO si la variable no existe
+#    (para que el proyecto te siga funcionando igual en tu máquina local).
+spring.datasource.url=${DB_URL:jdbc:mysql://127.0.0.1:3307/clinica_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+spring.datasource.username=${DB_USER:root}
+spring.datasource.password=${DB_PASSWORD:}
+
+# 3. Token de la API de DNI (apisperu.com) - viene de variable de entorno
+apisperu.token=${APISPERU_TOKEN:}
+
+# 4. Propiedades de Hibernate para crear tablas automáticamente
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# 5. Forzar dialecto para MariaDB/MySQL
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect

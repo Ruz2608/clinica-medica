@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Hospitalaria - UNHEVAL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8f9fa;
+            --card-border: #e9ecef;
+            --primary-dark: #0f172a;
+        }
+        body { background-color: white; font-family: 'Inter', sans-serif; }
+        
+        /* Header Limpio */
+        .header-section { 
+            padding: 50px 0 30px 0; 
+            text-align: center;
+        }
+        
+        /* Pestañas estilo capturas */
+        .nav-pills .nav-link { 
+            color: #64748b; 
+            background: #f1f5f9; 
+            margin: 0 5px; 
+            border-radius: 12px; 
+            padding: 10px 35px; 
+            font-weight: 500; 
+            transition: all 0.2s;
+        }
+        .nav-pills .nav-link.active { 
+            background: white; 
+            color: black; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+            border: 1px solid #eee; 
+        }
+        
+        /* Tarjetas de formulario */
+        .card-custom { 
+            border: 1px solid var(--card-border); 
+            border-radius: 20px; 
+            padding: 35px; 
+            margin-top: 25px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        }
+        .form-label { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+        .form-control, .form-select { 
+            border-radius: 10px; 
+            border: 1px solid #e2e8f0; 
+            padding: 12px; 
+            background-color: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-dark);
+            box-shadow: none;
+        }
+        
+        .btn-dark-custom { 
+            background: var(--primary-dark); 
+            color: white; 
+            border-radius: 10px; 
+            padding: 12px 30px; 
+            font-weight: 600; 
+            border: none; 
+            transition: opacity 0.2s;
+        }
+        .btn-dark-custom:hover { opacity: 0.9; color: white; }
+
+        /* Estilo para el historial */
+        #resultado {
+            background-color: #f8fafc;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <h1 class="fw-bold m-0" style="font-size: 2.5rem;">Gestión Hospitalaria</h1>
+        <p class="text-muted mt-2">Caso clínico — pacientes, médicos y enfermedades</p>
+    </div>
+
+    <ul class="nav nav-pills justify-content-center mt-2" id="pills-tab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#sec-pacientes" onclick="cargarMedicos()">Pacientes</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sec-medicos">Médicos</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sec-enfermedades">Enfermedades</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sec-historial">Historial</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#sec-citas" onclick="prepararFormularioCita()">Citas</button></li>
+    </ul>
+
+    <div class="tab-content pb-5" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="sec-pacientes">
+            <div class="card-custom mx-auto" style="max-width: 900px;">
+                <h5 class="fw-bold mb-4">Registrar Paciente</h5>
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">N° Historial</label><input type="text" id="p_historial" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">DNI</label><input type="text" id="p_dni" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" id="p_nombre" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Primer Apellido</label><input type="text" id="p_apellido" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" id="p_direccion" class="form-control"></div>
+                    <div class="col-md-6">
+                        <label class="form-label">Médico responsable</label>
+                        <select id="p_medico" class="form-select"><option value="">Seleccione un médico</option></select>
+                        <button class="btn btn-link btn-sm p-0 mt-2 text-decoration-none text-muted" onclick="cargarMedicos()">Recargar médicos</button>
+                    </div>
+                </div>
+                <div class="text-start">
+                    <button class="btn btn-dark-custom mt-4" onclick="registrarPaciente()">Registrar paciente</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="sec-medicos">
+            <div class="card-custom mx-auto" style="max-width: 900px;">
+                <h5 class="fw-bold mb-4">Registrar Médico</h5>
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Código identificativo</label><input type="text" id="m_codigo" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">DNI</label><input type="text" id="m_dni" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" id="m_nombre" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Primer Apellido</label><input type="text" id="m_apellido" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Especialidad</label><input type="text" id="m_especialidad" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" id="m_direccion" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Fecha nacimiento</label><input type="date" id="m_fecha" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Centro de estudios</label><input type="text" id="m_centro" class="form-control"></div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tipo de contratación</label>
+                        <select id="m_tipo" class="form-select">
+                            <option value="NOMBRADO">NOMBRADO</option>
+                            <option value="CONTRATADO">CONTRATADO</option>
+                            <option value="CONSULTOR">CONSULTOR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-start">
+                    <button class="btn btn-dark-custom mt-4" onclick="registrarMedico()">Registrar médico</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="sec-enfermedades">
+            <div class="row justify-content-center g-4">
+                <div class="col-md-5">
+                    <div class="card-custom">
+                        <h5 class="fw-bold mb-4">Registrar Enfermedad</h5>
+                        <div class="mb-3"><label class="form-label">Código</label><input type="text" id="e_codigo" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">Nombre</label><input type="text" id="e_nombre" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">Sistema corporal</label><input type="text" id="e_sistema" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">Descripción</label><input type="text" id="e_desc" class="form-control"></div>
+                        <button class="btn btn-dark-custom w-100" onclick="registrarEnfermedad()">Registrar</button>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="card-custom">
+                        <h5 class="fw-bold mb-4">Asignar a Paciente</h5>
+                        <div class="mb-3"><label class="form-label">Código enfermedad</label><input type="text" id="asig_e" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">N° historial paciente</label><input type="text" id="asig_p" class="form-control"></div>
+                        <button class="btn btn-dark-custom w-100" onclick="asignarEnfermedad()">Asignar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="sec-historial">
+            <div class="card-custom mx-auto" style="max-width: 800px;">
+                <h5 class="fw-bold mb-4">Buscar Historial Clínico</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" id="busqueda" class="form-control" placeholder="N° de historial">
+                    <button class="btn btn-dark-custom px-4" onclick="buscarHistorial()">Buscar</button>
+                </div>
+                <div id="resultado" class="mt-4 p-4 border-top" style="display:none;"></div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="sec-citas">
+    <div class="row justify-content-center g-4">
+        <div class="col-md-4">
+            <div class="card-custom">
+                <h5 class="fw-bold mb-4">Agendar Cita Médica</h5>
+                <div class="mb-3">
+                    <label class="form-label">Paciente</label>
+                    <select id="c_paciente" class="form-select"><option value="">Cargando pacientes...</option></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Médico</label>
+                    <select id="c_medico" class="form-select"><option value="">Cargando médicos...</option></select>
+                </div>
+                <div class="mb-3"><label class="form-label">Fecha</label><input type="date" id="c_fecha" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">Hora</label><input type="time" id="c_hora" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">Motivo</label><input type="text" id="c_motivo" class="form-control" placeholder="Ej: Control general"></div>
+                <button class="btn btn-dark-custom w-100" onclick="registrarCita()">Agendar Cita</button>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card-custom">
+                <h5 class="fw-bold mb-4">Citas Programadas</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Paciente</th>
+                                <th>Médico</th>
+                                <th>Motivo</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acciones</th> </tr>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-citas-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const API_BASE = "http://localhost:8080/api";
+
+    async function cargarMedicos() {
+        const select = document.getElementById('p_medico');
+        try {
+            const res = await fetch(`${API_BASE}/medicos/listar`);
+            const medicos = await res.json();
+            select.innerHTML = '<option value="">Seleccione un médico</option>';
+            medicos.forEach(m => {
+                select.innerHTML += `<option value="${m.codigoIdentificativo}">${m.nombre} ${m.primerApellido} (${m.especialidad})</option>`;
+            });
+        } catch (e) { console.error("Error cargando médicos", e); }
+    }
+
+    async function registrarPaciente() {
+    const idMed = document.getElementById('p_medico').value;
+    
+    // Si no seleccionaste médico, enviamos null para evitar errores de relación
+    const data = {
+        numeroHistorial: document.getElementById('p_historial').value,
+        dni: document.getElementById('p_dni').value,
+        nombre: document.getElementById('p_nombre').value,
+        primerApellido: document.getElementById('p_apellido').value,
+        direccion: document.getElementById('p_direccion').value,
+        // Solo enviamos el objeto médico si hay un ID seleccionado
+        medico: idMed ? { codigoIdentificativo: idMed } : null
+    };
+
+    try {
+        const res = await fetch(`${API_BASE}/pacientes/registrar`, {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if(res.ok) {
+            alert("¡Paciente registrado con éxito!");
+            // Limpiar campos
+            document.querySelectorAll('#sec-pacientes input').forEach(i => i.value = '');
+        } else {
+            const errorData = await res.json();
+            console.error("Error del servidor:", errorData);
+            alert("Error al registrar: revisa la consola.");
+        }
+    } catch (e) {
+        alert("El servidor se apagó. Revisa el bucle infinito en Java.");
+    }
+}
+
+    async function registrarMedico() {
+        const data = {
+            codigoIdentificativo: document.getElementById('m_codigo').value,
+            dni: document.getElementById('m_dni').value,
+            nombre: document.getElementById('m_nombre').value,
+            primerApellido: document.getElementById('m_apellido').value,
+            especialidad: document.getElementById('m_especialidad').value,
+            direccion: document.getElementById('m_direccion').value,
+            fechaNacimiento: document.getElementById('m_fecha').value,
+            centroEstudios: document.getElementById('m_centro').value,
+            tipoContratacion: document.getElementById('m_tipo').value
+        };
+        const res = await fetch(`${API_BASE}/medicos/registrar`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(res.ok) alert("¡Médico registrado!");
+    }
+
+    async function registrarEnfermedad() {
+        const data = {
+            codigo: document.getElementById('e_codigo').value,
+            nombre: document.getElementById('e_nombre').value,
+            sistemaCorporal: document.getElementById('e_sistema').value,
+            descripcion: document.getElementById('e_desc').value
+        };
+        const res = await fetch(`${API_BASE}/enfermedades/registrar`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(res.ok) alert("¡Enfermedad registrada!");
+    }
+
+    async function asignarEnfermedad() {
+        const codE = document.getElementById('asig_e').value;
+        const numP = document.getElementById('asig_p').value;
+        const res = await fetch(`${API_BASE}/enfermedades/${codE}/asignar-a/${numP}`, { method: 'PUT' });
+        if(res.ok) alert("¡Asignación exitosa!");
+    }
+
+    async function buscarHistorial() {
+        const id = document.getElementById('busqueda').value;
+        const res = await fetch(`${API_BASE}/pacientes/historial/${id}`);
+        const div = document.getElementById('resultado');
+        if(res.ok) {
+            const p = await res.json();
+            div.style.display = 'block';
+            div.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted small fw-bold">PACIENTE</p>
+                        <h4 class="fw-bold">${p.nombre} ${p.primerApellido}</h4>
+                        <p class="text-muted mb-0">DNI: ${p.dni}</p>
+                        <p class="text-muted">Historial: ${p.numeroHistorial}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1 text-muted small fw-bold">MÉDICO RESPONSABLE</p>
+                        <h4 class="fw-bold">${p.medico ? p.medico.nombre + ' ' + p.medico.primerApellido : 'Sin asignar'}</h4>
+                        <p class="text-muted">${p.medico ? p.medico.especialidad : '-'}</p>
+                    </div>
+                </div>
+                <div class="mt-2 border-top pt-3">
+                    <p class="mb-2 text-muted small fw-bold">DIAGNÓSTICOS ASOCIADOS</p>
+                    ${p.enfermedades.length > 0 ? 
+                        p.enfermedades.map(e => `
+                            <div class="mb-2 p-2 bg-white border rounded">
+                                <strong>${e.nombre}</strong> (${e.sistemaCorporal})<br>
+                                <span class="text-muted small">${e.descripcion}</span>
+                            </div>
+                        `).join('') : '<p class="text-muted italic">No se registran enfermedades.</p>'
+                    }
+                </div>
+            `;
+        } else {
+            alert("No se encontró el historial clínico solicitado.");
+        }
+    }
+    // Carga los selects de médicos y pacientes, y actualiza la tabla
+async function prepararFormularioCita() {
+    cargarCitasTabla();
+    
+    // Cargar médicos en el select de citas
+    try {
+        const resM = await fetch(`${API_BASE}/medicos/listar`);
+        const medicos = await resM.json();
+        const selectM = document.getElementById('c_medico');
+        selectM.innerHTML = '<option value="">Seleccione un médico</option>';
+        medicos.forEach(m => {
+            selectM.innerHTML += `<option value="${m.codigoIdentificativo}">${m.nombre} ${m.primerApellido}</option>`;
+        });
+    } catch(e) { console.error(e); }
+
+    // Cargar pacientes en el select de citas (asumiendo que tienes /pacientes/listar o similar)
+    try {
+        const resP = await fetch(`${API_BASE}/pacientes/listar`); 
+        const pacientes = await resP.json();
+        const selectP = document.getElementById('c_paciente');
+        selectP.innerHTML = '<option value="">Seleccione un paciente</option>';
+        pacientes.forEach(p => {
+            selectP.innerHTML += `<option value="${p.numeroHistorial}">${p.nombre} ${p.primerApellido}</option>`;
+        });
+    } catch(e) { 
+        // Si no tienes un listar de pacientes general todavía, puedes usar un input de texto para el historial en su lugar.
+        console.error("Si no tienes listar general de pacientes, cambia el select por un input de texto", e); 
+    }
+}
+
+async function registrarCita() {
+    const data = {
+        fecha: document.getElementById('c_fecha').value,
+        hora: document.getElementById('c_hora').value + ":00", // Formato HH:mm:ss
+        motivo: document.getElementById('c_motivo').value,
+        paciente: { numeroHistorial: document.getElementById('c_paciente').value },
+        medico: { codigoIdentificativo: document.getElementById('c_medico').value }
+    };
+
+    const res = await fetch(`${API_BASE}/citas/registrar`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+
+    if(res.ok) {
+        alert("¡Cita agendada con éxito!");
+        prepararFormularioCita(); // Recarga la tabla y limpia
+    } else {
+        alert("Error al agendar la cita.");
+    }
+}
+
+async function cargarCitasTabla() {
+    try {
+        const res = await fetch(`${API_BASE}/citas/listar`);
+        const citas = await res.json();
+        const tbody = document.getElementById('tabla-citas-body');
+        tbody.innerHTML = '';
+        
+        if(citas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay citas registradas</td></tr>';
+            return;
+        }
+
+        citas.forEach(c => {
+            // Configurar el color del Badge según el estado
+            let badgeClass = "bg-warning text-dark"; // PENDIENTE
+            if (c.estado === "COMPLETADA") badgeClass = "bg-success text-white";
+            if (c.estado === "CANCELADA") badgeClass = "bg-danger text-white";
+
+            // Mostrar botones de acción solo si está PENDIENTE
+            let acciones = "";
+            if (c.estado === "PENDIENTE") {
+                acciones = `
+                    <button class="btn btn-sm btn-outline-success me-1" onclick="cambiarEstadoCita(${c.id}, 'completar')" title="Completar Cita">✔️</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="cambiarEstadoCita(${c.id}, 'cancelar')" title="Cancelar Cita">❌</button>
+                `;
+            } else {
+                acciones = `<span class="text-muted small">Sin acciones</span>`;
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${c.fecha}</strong><br><small class="text-muted">${c.hora}</small></td>
+                    <td>${c.paciente}</td>
+                    <td>${c.medico}</td>
+                    <td>${c.motivo}</td>
+                    <td><span class="badge ${badgeClass}">${c.estado}</span></td>
+                    <td class="text-center">${acciones}</td>
+                </tr>
+            `;
+        });
+    } catch(e) { console.error(e); }
+}
+async function cambiarEstadoCita(id, accion) {
+    try {
+        const res = await fetch(`${API_BASE}/citas/${id}/${accion}`, {
+            method: 'PUT'
+        });
+
+        if (res.ok) {
+            // Recargar la tabla inmediatamente para ver el cambio de color y estado
+            cargarCitasTabla();
+        } else {
+            alert("No se pudo actualizar el estado de la cita.");
+        }
+    } catch (error) {
+        console.error("Error al cambiar estado:", error);
+        alert("Error de conexión con el servidor.");
+    }
+}
+
+    window.onload = cargarMedicos;
+</script>
+
+</body>
+</html>
