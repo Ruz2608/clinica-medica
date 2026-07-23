@@ -23,14 +23,14 @@ public class Cita {
     private LocalDate fecha;
     private LocalTime hora;
     private String motivo;
-    private String estado; // PENDIENTE, COMPLETADA, CANCELADA
+    private String estado; 
 
-    // Relación con Paciente
+    
     @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "numeroHistorial")
     private Paciente paciente;
 
-    // Relación con Médico
+    
     @ManyToOne
     @JoinColumn(name = "medico_id", referencedColumnName = "codigoIdentificativo")
     private Medico medico;
