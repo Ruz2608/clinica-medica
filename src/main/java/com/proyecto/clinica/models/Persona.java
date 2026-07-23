@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-// ELIMINAMOS @Data para que no genere métodos circulares
+    
 public abstract class Persona {
     private String dni;
     private String nombre;
