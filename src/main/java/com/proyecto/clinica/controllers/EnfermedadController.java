@@ -31,7 +31,7 @@ public class EnfermedadController {
         Enfermedad enfermedad = enfermedadRepository.findById(codigoEnfermedad)
             .orElseThrow(() -> new RuntimeException("Enfermedad no encontrada"));
 
-        paciente.getEnfermedades().add(enfermedad); // Agrega a la lista sin borrar las anteriores
+        paciente.getEnfermedades().add(enfermedad); 
         return pacienteRepository.save(paciente);
     }
 }
